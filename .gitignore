@@ -1,2 +1,5 @@
+_deps
+build
 lib
+bin
 compile_commands.json
