@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wisp/core/Component.hpp"
+#include "../core/Component.hpp"
 
 class Box : public Component
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "wisp/core/Component.hpp"
-#include "wisp/core/managers/EventDispatcher.hpp"
+#include "../Component.hpp"
+#include "../managers/EventDispatcher.hpp"
 #include <memory>
 #include <vector>
 

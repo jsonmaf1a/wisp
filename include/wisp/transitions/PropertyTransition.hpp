@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wisp/transitions/Transition.hpp"
+#include "../transitions/Transition.hpp"
 #include <functional>
 
 template <typename T> class PropertyTransition : public Transition

@@ -1,5 +1,5 @@
 #pragma once
-#include "wisp/transitions/Transition.hpp"
+#include "../../transitions/Transition.hpp"
 #include <memory>
 
 namespace TransitionManager

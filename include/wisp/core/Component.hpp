@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wisp/events/EventHandler.hpp"
+#include "../events/EventHandler.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>

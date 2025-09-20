@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wisp/events/EventHandler.hpp"
+#include "../../events/EventHandler.hpp"
 #include <memory>
 #include <vector>
 

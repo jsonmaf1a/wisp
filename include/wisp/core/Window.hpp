@@ -1,8 +1,8 @@
 #pragma once
 
-#include "wisp/core/managers/CursorManager.hpp"
-#include "wisp/core/managers/EventDispatcher.hpp"
-#include "wisp/core/managers/UIManager.hpp"
+#include "../core/managers/CursorManager.hpp"
+#include "../core/managers/EventDispatcher.hpp"
+#include "../core/managers/UIManager.hpp"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Cursor.hpp>
