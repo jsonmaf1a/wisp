@@ -2,11 +2,8 @@
 #include <wisp/utils/EventUtils.hpp>
 #include <wisp/utils/PositionUtils.hpp>
 
-// #define DEBUG
-
 void Button::drawSelf(sf::RenderWindow &window)
 {
-    // window.setView(view.value());
     drawBackground(window);
     drawLabel(window);
 }
@@ -74,7 +71,7 @@ EventResult Button::handleSelfEvent(const EventContext &eventCtx)
         auto normalizedPosition = PositionUtils::normalizePosition(
             mouseClick->position, eventCtx.window);
 
-        if(viewportContains(normalizedPosition))
+        if(contains(normalizedPosition))
         {
             return onClick(eventCtx);
         }
@@ -86,7 +83,7 @@ EventResult Button::handleSelfEvent(const EventContext &eventCtx)
         auto normalizedPosition = PositionUtils::normalizePosition(
             mouseMoved->position, eventCtx.window);
 
-        if(viewportContains(normalizedPosition))
+        if(contains(normalizedPosition))
         {
             // std::cout << "mouse over: " << id << "\n";
         }

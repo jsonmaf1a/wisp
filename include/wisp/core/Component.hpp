@@ -7,8 +7,7 @@
 #include <memory>
 #include <vector>
 
-class Component : public EventHandler,
-                  public std::enable_shared_from_this<Component>
+class Component : public EventHandler, public std::enable_shared_from_this<Component>
 {
   protected:
     Component(sf::FloatRect bounds)
@@ -17,12 +16,14 @@ class Component : public EventHandler,
     Component(sf::Vector2f size)
         : id(nextID++)
         , bounds(sf::FloatRect({0, 0}, size)) {};
+    Component()
+        : id(nextID++)
+        , bounds(sf::FloatRect({0, 0}, {0, 0})) {};
 
     virtual ~Component() = default;
 
     sf::FloatRect bounds;
     std::vector<std::shared_ptr<Component>> children;
-    std::optional<sf::View> view = std::nullopt;
 
     unsigned int id;
     bool visible = true;
@@ -30,14 +31,11 @@ class Component : public EventHandler,
     std::weak_ptr<Component> parent;
 
     virtual void drawSelf(sf::RenderWindow &window) = 0;
+    void drawBoundingBox(sf::RenderWindow &widnow);
+    virtual void arrangeChildren() = 0; // TODO: default `arrangeChildren` impl
 
   public:
     virtual void draw(sf::RenderWindow &window);
-
-    // sf::FloatRect createViewport();
-    void enableView();
-    void enableView(sf::View view);
-    const std::optional<sf::View> &getView() const;
 
     EventResult handleEvent(const EventContext &event) override;
     virtual EventResult handleSelfEvent(const EventContext &eventCtx)
@@ -47,6 +45,7 @@ class Component : public EventHandler,
 
     void addChild(std::shared_ptr<Component> child);
     void removeChild(std::shared_ptr<Component> child);
+    bool hasChildren() const;
     void printChildren() const;
     void setVisible(bool visible);
     bool isVisible() const;
@@ -55,11 +54,9 @@ class Component : public EventHandler,
     void setBounds(const sf::FloatRect &bounds);
     const sf::FloatRect &getBounds() const;
 
-    template <typename T>
-    bool viewportContains(const sf::Vector2<T> &position) const
+    template <typename T> bool contains(const sf::Vector2<T> &position) const
     {
-        return view.has_value() && visible && enabled &&
-               view->getViewport().contains(sf::Vector2f(position));
+        return visible && enabled && bounds.contains(sf::Vector2f(position));
     }
 
   private:

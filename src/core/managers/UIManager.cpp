@@ -3,37 +3,42 @@
 
 void UIManager::addComponent(std::shared_ptr<Component> component)
 {
-    rootComponents.push_back(component);
+    rootBox->addChild(component);
     dispatcher.registerListener(component);
+}
+
+void UIManager::adjustComponent(std::shared_ptr<Component> component)
+{
+    // if(rootBox.hasChildren())
+    // {
+    //     component->setBounds(rootBox->getBounds().size -
+    //     rootBox.getOccupiedSpace); component->setPosition(occupiedSpace)
+    // }
+    // else
+    // {
+    //     component->setBounds(rootBox->getBounds().size)
+    //     component->setPosition(rootBox->getBounds().position)
+    // }
 }
 
 void UIManager::removeComponent(std::shared_ptr<Component> component)
 {
     dispatcher.unregisterListener(component);
-    rootComponents.erase(
-        std::remove(rootComponents.begin(), rootComponents.end(), component),
-        rootComponents.end());
+    rootBox->removeChild(component);
 }
 
-void UIManager::handleEvent(const EventContext &event)
-{
-    for(auto it = rootComponents.rbegin(); it != rootComponents.rend(); ++it)
-    {
-        EventResult result = (*it)->handleEvent(event);
-        if(result == EventResult::Consumed)
-        {
-            break;
-        }
-    }
-}
+void UIManager::handleEvent(const EventContext &event) { rootBox->handleEvent(event); }
 
 void UIManager::draw(sf::RenderWindow &window)
 {
-    for(auto &component : rootComponents)
-    {
-        float dt = clock.restart().asSeconds();
-        TransitionManager::update(dt);
+    float dt = clock.restart().asSeconds();
+    TransitionManager::update(dt);
 
-        component->draw(window);
-    }
+    rootBox->draw(window);
+}
+
+void UIManager::setRootBox(std::shared_ptr<Box> box)
+{
+    rootBox = box;
+    dispatcher.registerListener(rootBox);
 }

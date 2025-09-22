@@ -12,15 +12,14 @@ class Button : public Component
         : Component(size)
         , text(label)
         , font(font)
-        , fontSize(fontSize) {
-            // setView(bounds);
-        };
+        , fontSize(fontSize) {};
     ~Button() = default;
 
     void setText(std::string text);
     void setOnClick(std::function<EventResult(const EventContext &)> onClick);
-    virtual void drawSelf(sf::RenderWindow &window) override;
-    virtual EventResult handleSelfEvent(const EventContext &eventCtx) override;
+    virtual void drawSelf(sf::RenderWindow &window) override final;
+    virtual EventResult handleSelfEvent(
+        const EventContext &eventCtx) override final;
 
   private:
     std::function<EventResult(const EventContext &)> onClick;

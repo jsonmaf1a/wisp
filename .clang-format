@@ -1,6 +1,6 @@
 Language: Cpp
 BasedOnStyle: Microsoft
-ColumnLimit: 80
+ColumnLimit: 100
 IndentWidth: 4
 AllowShortFunctionsOnASingleLine: All
 SpaceBeforeParens: Never

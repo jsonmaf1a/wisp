@@ -1,7 +1,7 @@
 #include "config/LayoutConfig.hpp"
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include <wisp/core/Window.hpp>
-#include <wisp/ui/Box.hpp>
 
 int main()
 {
@@ -10,14 +10,10 @@ int main()
     auto &ui = window.getUI();
     auto &renderWindow = window.getRenderWindow();
 
-    auto box = std::make_shared<Box>(
-        renderWindow,
-        sf::FloatRect{{0.f, 0.f},
-                      {LayoutConfig::WindowSize.x, LayoutConfig::WindowSize.y}},
-        sf::FloatRect{
-            {0.f, 0.f},
-            {LayoutConfig::WindowSize.x, LayoutConfig::WindowSize.y}});
-    ui.addComponent(box);
+    auto box1 = std::make_shared<Box>(renderWindow);
+    auto box2 = std::make_shared<Box>(renderWindow);
+
+    ui.addComponents(box1, box2);
 
     while(window.isOpen())
     {

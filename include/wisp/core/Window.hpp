@@ -11,24 +11,29 @@
 class Window
 {
   public:
-    static constexpr const char *WINDOW_TITLE = "wisp_window";
-
-    Window(uint width, uint height, const std::string &title = WINDOW_TITLE);
+    Window(uint width, uint height,
+           const std::string &title = WINDOW_DEFAULT_TITLE);
     ~Window();
 
     void update();
     void pollEvents();
-    bool isOpen() const;
-
     sf::RenderWindow &getRenderWindow();
     EventDispatcher &getEventDispatcher();
     UIManager &getUI();
+    const std::string &getTitle() const;
+    bool isOpen() const;
 
   private:
+    bool isInitialized = false;
+
+    const std::string &title;
     sf::RenderWindow window;
     EventDispatcher dispatcher;
     CursorManager cursorManager;
     UIManager ui;
 
-    bool isInitialized = false;
+    void configure();
+    void createRootBox();
+
+    static constexpr const char *WINDOW_DEFAULT_TITLE = "wisp_window";
 };
