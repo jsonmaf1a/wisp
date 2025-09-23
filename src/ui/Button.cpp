@@ -1,6 +1,5 @@
 #include <wisp/ui/Button.hpp>
 #include <wisp/utils/EventUtils.hpp>
-#include <wisp/utils/PositionUtils.hpp>
 
 void Button::drawSelf(sf::RenderWindow &window)
 {
@@ -12,10 +11,9 @@ void Button::drawLabel(sf::RenderWindow &window)
 {
     sf::Text label(font, text, fontSize);
     label.setOrigin(label.getLocalBounds().position);
-    label.setPosition({bounds.position.x + bounds.size.x / 2.f -
-                           label.getGlobalBounds().size.x / 2.f,
-                       bounds.position.y + bounds.size.y / 2.f -
-                           label.getGlobalBounds().size.y / 2.f});
+    label.setPosition(
+        {bounds.position.x + bounds.size.x / 2.f - label.getGlobalBounds().size.x / 2.f,
+         bounds.position.y + bounds.size.y / 2.f - label.getGlobalBounds().size.y / 2.f});
     label.setFillColor(foreground);
 
     sf::RectangleShape labelBounds(label.getLocalBounds().size);
@@ -68,10 +66,10 @@ EventResult Button::handleSelfEvent(const EventContext &eventCtx)
     if(EventUtils::isLeftClickEvent(eventCtx.event))
     {
         auto mouseClick = eventCtx.event.getIf<sf::Event::MouseButtonPressed>();
-        auto normalizedPosition = PositionUtils::normalizePosition(
-            mouseClick->position, eventCtx.window);
+        sf::Vector2f mousePosF(static_cast<float>(mouseClick->position.x),
+                               static_cast<float>(mouseClick->position.y));
 
-        if(contains(normalizedPosition))
+        if(contains(mousePosF))
         {
             return onClick(eventCtx);
         }
@@ -80,10 +78,10 @@ EventResult Button::handleSelfEvent(const EventContext &eventCtx)
     if(eventCtx.event.is<sf::Event::MouseMoved>())
     {
         auto mouseMoved = eventCtx.event.getIf<sf::Event::MouseMoved>();
-        auto normalizedPosition = PositionUtils::normalizePosition(
-            mouseMoved->position, eventCtx.window);
+        sf::Vector2f mousePosF(static_cast<float>(mouseMoved->position.x),
+                               static_cast<float>(mouseMoved->position.y));
 
-        if(contains(normalizedPosition))
+        if(contains(mousePosF))
         {
             // std::cout << "mouse over: " << id << "\n";
         }
@@ -93,8 +91,9 @@ EventResult Button::handleSelfEvent(const EventContext &eventCtx)
 
 void Button::setText(std::string text) { this->text = text; }
 
-void Button::setOnClick(
-    std::function<EventResult(const EventContext &)> onClick)
+void Button::setOnClick(std::function<EventResult(const EventContext &)> onClick)
 {
     this->onClick = onClick;
 }
+
+const char *Button::getName() const { return "Box"; };

@@ -30,9 +30,11 @@ class Component : public EventHandler, public std::enable_shared_from_this<Compo
     bool enabled = true;
     std::weak_ptr<Component> parent;
 
+    virtual const char *getName() const = 0;
+
     virtual void drawSelf(sf::RenderWindow &window) = 0;
-    void drawBoundingBox(sf::RenderWindow &widnow);
-    virtual void arrangeChildren() = 0; // TODO: default `arrangeChildren` impl
+    void drawBoundingBox(sf::RenderWindow &window);
+    virtual void arrangeChildren() = 0;
 
   public:
     virtual void draw(sf::RenderWindow &window);

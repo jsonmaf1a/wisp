@@ -7,20 +7,6 @@ void UIManager::addComponent(std::shared_ptr<Component> component)
     dispatcher.registerListener(component);
 }
 
-void UIManager::adjustComponent(std::shared_ptr<Component> component)
-{
-    // if(rootBox.hasChildren())
-    // {
-    //     component->setBounds(rootBox->getBounds().size -
-    //     rootBox.getOccupiedSpace); component->setPosition(occupiedSpace)
-    // }
-    // else
-    // {
-    //     component->setBounds(rootBox->getBounds().size)
-    //     component->setPosition(rootBox->getBounds().position)
-    // }
-}
-
 void UIManager::removeComponent(std::shared_ptr<Component> component)
 {
     dispatcher.unregisterListener(component);

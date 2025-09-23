@@ -7,8 +7,7 @@
 class Button : public Component
 {
   public:
-    Button(sf::Vector2f size, std::string label, const sf::Font &font,
-           unsigned int fontSize = 14)
+    Button(sf::Vector2f size, std::string label, const sf::Font &font, unsigned int fontSize = 14)
         : Component(size)
         , text(label)
         , font(font)
@@ -18,8 +17,7 @@ class Button : public Component
     void setText(std::string text);
     void setOnClick(std::function<EventResult(const EventContext &)> onClick);
     virtual void drawSelf(sf::RenderWindow &window) override final;
-    virtual EventResult handleSelfEvent(
-        const EventContext &eventCtx) override final;
+    virtual EventResult handleSelfEvent(const EventContext &eventCtx) override final;
 
   private:
     std::function<EventResult(const EventContext &)> onClick;
@@ -31,4 +29,7 @@ class Button : public Component
 
     void drawLabel(sf::RenderWindow &window);
     void drawBackground(sf::RenderWindow &window);
+
+  protected:
+    virtual const char *getName() const override final;
 };

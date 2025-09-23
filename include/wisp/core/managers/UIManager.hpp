@@ -28,6 +28,4 @@ class UIManager
   private:
     EventDispatcher &dispatcher;
     sf::Clock clock;
-
-    void adjustComponent(std::shared_ptr<Component> component);
 };

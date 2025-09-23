@@ -10,6 +10,7 @@ void Component::addChild(std::shared_ptr<Component> child)
 {
     child->parent = weak_from_this();
     children.push_back(child);
+
     arrangeChildren();
 }
 
@@ -80,14 +81,14 @@ void Component::printChildren() const
 
     for(auto &child : _children)
     {
-        std::println("{}: {}x{}", child->id, child->bounds.size.x, child->bounds.size.y);
+        std::println("[{}] {}: {}x{} at {}x{}", child->id, getName(), child->bounds.size.x,
+                     child->bounds.size.y, child->bounds.position.x, child->bounds.position.y);
     }
 }
 
 void Component::drawBoundingBox(sf::RenderWindow &window)
 {
     sf::RectangleShape boundingBox;
-
     boundingBox.setSize(bounds.size);
     boundingBox.setPosition(bounds.position);
     boundingBox.setFillColor(sf::Color::Transparent);
