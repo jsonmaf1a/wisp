@@ -12,6 +12,33 @@ namespace wisp
 {
     class Component : public EventHandler, public std::enable_shared_from_this<Component>
     {
+      public:
+        virtual void arrangeChildren() = 0;
+        virtual void draw(sf::RenderWindow &window);
+        EventResult handleEvent(const EventContext &event) override;
+
+        void addChild(std::shared_ptr<Component> child);
+        template <std::derived_from<Component>... Components>
+        void addChildren(const std::shared_ptr<Components> &...components)
+        {
+            (addChild(components), ...);
+        }
+        void removeChild(std::shared_ptr<Component> child);
+        bool hasChildren() const;
+        void printChildren() const;
+        void setVisible(bool visible);
+        bool isVisible() const;
+        void setEnabled(bool enabled);
+        bool isEnabled() const;
+        void setIsDirty(bool dirty);
+        const bool getIsDirty();
+        void setBounds(const sf::FloatRect &bounds);
+        const sf::FloatRect &getBounds() const;
+        template <typename T> bool contains(const sf::Vector2<T> &position) const
+        {
+            return visible && enabled && bounds.contains(sf::Vector2f(position));
+        }
+
       protected:
         Component(sf::FloatRect bounds)
             : id(nextID++)
@@ -25,6 +52,7 @@ namespace wisp
 
         virtual ~Component() = default;
 
+        bool isDirty = false;
         sf::FloatRect bounds;
         std::vector<std::shared_ptr<Component>> children;
 
@@ -42,34 +70,7 @@ namespace wisp
             return EventResult::Ignored;
         }
 
-      public:
-        virtual void arrangeChildren() = 0;
-
-        virtual void draw(sf::RenderWindow &window);
-        EventResult handleEvent(const EventContext &event) override;
-
-        void addChild(std::shared_ptr<Component> child);
-        template <std::derived_from<Component>... Components>
-        void addChildren(const std::shared_ptr<Components> &...components)
-        {
-            (addChild(components), ...);
-        }
-        void removeChild(std::shared_ptr<Component> child);
-        bool hasChildren() const;
-        void printChildren() const;
-        void setVisible(bool visible);
-        bool isVisible() const;
-        void setEnabled(bool enabled);
-        bool isEnabled() const;
-        void setBounds(const sf::FloatRect &bounds);
-        const sf::FloatRect &getBounds() const;
-        template <typename T> bool contains(const sf::Vector2<T> &position) const
-        {
-            return visible && enabled && bounds.contains(sf::Vector2f(position));
-        }
-
       private:
         static inline int nextID = 0;
     };
-
 } // namespace wisp

@@ -14,66 +14,72 @@ int main()
     auto &ui = window.getUI();
     auto &renderWindow = window.getRenderWindow();
 
-    auto box1 = std::make_shared<wisp::Box>(sf::FloatRect{{0, 0}, {375, 800}});
-    auto box2 = std::make_shared<wisp::Box>();
-    auto box3 = std::make_shared<wisp::Box>();
-    auto box4 = std::make_shared<wisp::Box>();
-    auto box5 = std::make_shared<wisp::Box>();
-    auto box6 = std::make_shared<wisp::Box>();
-    auto box7 = std::make_shared<wisp::Box>();
+    auto sidebarBox = wisp::Box::create() // > 1.f means value in px
+                          ->setSize({LayoutConfig::WindowSize.x * 0.3, LayoutConfig::WindowSize.y})
+                          ->setDirection(wisp::Flex::Direction::Type::Row)
+                          ->setJustification(wisp::Flex::Justification::Type::End);
+
+    auto box1 = wisp::Box::create()->setSize({125, 50});
+    auto box2 = wisp::Box::create()->setSize({125, 50});
+    auto box3 = wisp::Box::create()->setSize({sidebarBox->getWidth(), 50});
+    auto box4 = wisp::Box::create()->setSize({65, 50});
+    auto box5 = wisp::Box::create()->setSize({200, 50});
+
+    sidebarBox->addChildren(box1, box2, box3, box4, box5);
 
     sf::Font font;
     bool _ = font.openFromFile("/home/hapka/dev/chess-cpp/assets/fonts/static/Roboto-Regular.ttf");
 
-    auto buttonJustifyEnd = std::make_shared<wisp::Button>("Justification::Center", font, 16);
-    buttonJustifyEnd->setOnClick([&, buttonJustifyEnd, box1](const wisp::EventContext &eventCtx) {
-        box1->setJustification(wisp::Flex::Justification::Type::Center);
-        box1->arrangeChildren();
-
+    auto buttonStart = std::make_shared<wisp::Button>("Start", font, 16);
+    buttonStart->setSize({200.f, 50.f});
+    buttonStart->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::Start);
         return wisp::EventResult::Consumed;
     });
 
-    auto buttonJustifySBetween =
-        std::make_shared<wisp::Button>("Justification::SpaceBetween", font, 16);
-    buttonJustifySBetween->setOnClick(
-        [&, buttonJustifySBetween, box1](const wisp::EventContext &eventCtx) {
-            box1->setJustification(wisp::Flex::Justification::Type::SpaceBetween);
-            box1->arrangeChildren();
+    auto buttonCenter = std::make_shared<wisp::Button>("Center", font, 16);
+    buttonCenter->setSize({200.f, 50.f});
+    buttonCenter->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::Center);
+        return wisp::EventResult::Consumed;
+    });
 
-            return wisp::EventResult::Consumed;
-        });
+    auto buttonEnd = std::make_shared<wisp::Button>("End", font, 16);
+    buttonEnd->setSize({200.f, 50.f});
+    buttonEnd->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::End);
+        return wisp::EventResult::Consumed;
+    });
 
-    box1->addChildren(box2, box3, box4, box5, box6);
-    box1->setDirection(wisp::Flex::Direction::Type::Row);
-    box1->setJustification(wisp::Flex::Justification::Type::End);
+    auto buttonSpaceBetween = std::make_shared<wisp::Button>("SpaceBetween", font, 16);
+    buttonSpaceBetween->setSize({200.f, 50.f});
+    buttonSpaceBetween->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::SpaceBetween);
+        return wisp::EventResult::Consumed;
+    });
 
-    box2->setWidth(125.f);
-    box2->setHeight(50.f);
-    box3->setWidth(125.f);
-    box3->setHeight(50.f);
-    box4->setWidth(200.f);
-    box4->setHeight(50.f);
-    box5->setWidth(65.f);
-    box5->setHeight(50.f);
-    box6->setWidth(269.8f);
-    box6->setHeight(20.f);
+    auto buttonSpaceAround = std::make_shared<wisp::Button>("SpaceAround", font, 16);
+    buttonSpaceAround->setSize({200.f, 50.f});
+    buttonSpaceAround->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::SpaceAround);
+        return wisp::EventResult::Consumed;
+    });
 
-    ui.addComponents(box1, box7);
+    auto buttonSpaceEvenly = std::make_shared<wisp::Button>("SpaceEvenly", font, 16);
+    buttonSpaceEvenly->setSize({200.f, 50.f});
+    buttonSpaceEvenly->setOnClick([sidebarBox](auto &ctx) {
+        sidebarBox->setJustification(wisp::Flex::Justification::Type::SpaceEvenly);
+        return wisp::EventResult::Consumed;
+    });
 
-    box7->setWidth(1.f);
-    box7->setHeight(1.f);
-    box7->addChildren(buttonJustifyEnd, buttonJustifySBetween);
-    box7->setDirection(wisp::Flex::Direction::Type::Column);
-    box7->setJustification(wisp::Flex::Justification::Type::Start);
-    buttonJustifyEnd->setWidth(300.f);
-    buttonJustifyEnd->setHeight(70.f);
-    buttonJustifySBetween->setWidth(300.f);
-    buttonJustifySBetween->setHeight(70.f);
+    auto mainBox = wisp::Box::create()
+                       ->setSize({LayoutConfig::WindowSize.x * 0.7, LayoutConfig::WindowSize.y})
+                       ->setJustification(wisp::Flex::Justification::Type::SpaceBetween)
+                       ->setDirection(wisp::Flex::Direction::Type::Column);
+    mainBox->addChildren(buttonStart, buttonCenter, buttonEnd, buttonSpaceAround,
+                         buttonSpaceBetween, buttonSpaceEvenly);
 
-    // manual re-arrange because of resizing
-    // TODO: automate re-arrange on resize
-    box1->arrangeChildren();
-    box7->arrangeChildren();
+    ui.addComponents(sidebarBox, mainBox);
 
     while(window.isOpen())
     {

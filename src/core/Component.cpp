@@ -10,14 +10,16 @@ namespace wisp
 {
     void Component::addChild(std::shared_ptr<Component> child)
     {
+        isDirty = true;
+
         child->parent = weak_from_this();
         children.push_back(child);
-
-        arrangeChildren();
     }
 
     void Component::removeChild(std::shared_ptr<Component> child)
     {
+        isDirty = true;
+
         auto it = std::find_if(children.begin(), children.end(), [&](const auto &currentChild) {
             return currentChild->id == child->id;
         });
@@ -27,14 +29,18 @@ namespace wisp
             (*it)->parent.reset();
             children.erase(it);
         }
-
-        arrangeChildren();
     }
 
     void Component::draw(sf::RenderWindow &window)
     {
         if(!visible)
             return;
+
+        if(isDirty)
+        {
+            arrangeChildren();
+            isDirty = false;
+        }
 
         drawSelf(window);
 
@@ -70,6 +76,9 @@ namespace wisp
     void Component::setEnabled(bool enabled) { this->enabled = enabled; }
 
     bool Component::isEnabled() const { return enabled; }
+
+    void Component::setIsDirty(bool dirty) { isDirty = dirty; }
+    const bool Component::getIsDirty() { return isDirty; }
 
     void Component::setBounds(const sf::FloatRect &bounds) { this->bounds = bounds; }
 

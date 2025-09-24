@@ -10,6 +10,21 @@ namespace wisp
     class Box : public Component
     {
       public:
+        using Self = Box;
+        using SharedSelf = std::shared_ptr<Box>;
+
+        static SharedSelf create(const sf::FloatRect &bounds = {{0, 0}, {0, 0}})
+        {
+            return std::make_shared<Box>(bounds);
+        }
+
+        SharedSelf setSize(sf::Vector2f size);
+        SharedSelf setWidth(float width);
+        SharedSelf setHeight(float width);
+        SharedSelf setDirection(Flex::Direction::Type direction);
+        SharedSelf setJustification(Flex::Justification::Type justify);
+        SharedSelf setAlignment(Flex::Alignment::Type align);
+
         Box(sf::FloatRect bounds)
             : Component(bounds)
             , availableSpace(bounds.size)
@@ -36,21 +51,21 @@ namespace wisp
         }
         ~Box() = default;
 
-        void setWidth(float width);
         const float getWidth();
-        void setHeight(float height);
         const float getHeight();
-        void setJustification(Flex::Justification::Type type);
         const Flex::Justification::Type getJustification();
-        void setAlignment(Flex::Alignment::Type type);
         const Flex::Alignment::Type getAlignment();
-        void setDirection(Flex::Direction::Type type);
         const Flex::Direction::Type getDirection();
 
         virtual void arrangeChildren() override final;
 
       protected:
         sf::Vector2f availableSpace;
+
+        // TODO: remove this bullshit
+        sf::Vector2f rawSize{0, 0};
+        sf::Vector2f computedSize{0, 0};
+
         Flex::Direction::Type direction = Flex::Direction::Type::Row;
         Flex::Justification::Type justify = Flex::Justification::Type::Start;
         Flex::Alignment::Type align = Flex::Alignment::Type::Start;
@@ -78,5 +93,8 @@ namespace wisp
                                  float availableMainSize) const;
         void addChildToLine(Flex::FlexLine &line, const std::shared_ptr<Component> &child,
                             float childMainSize, float childCrossSize) const;
+
+        void setWidthInternal(float width);
+        void setHeightInternal(float width);
     };
 } // namespace wisp

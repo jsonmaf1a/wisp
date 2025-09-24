@@ -67,6 +67,23 @@ namespace wisp
 
     void Box::arrangeChildren()
     {
+        // sf::Vector2f parentSize{0, 0};
+        // if(auto p = parent.lock())
+        // {
+        //     parentSize = p->getBounds().size;
+        // }
+        // else
+        // {
+        //     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+        //     parentSize = {static_cast<float>(desktop.size.x),
+        //     static_cast<float>(desktop.size.y)};
+        // }
+        //
+        // computedSize.x = (rawSize.x <= 1.f) ? parentSize.x * rawSize.x : rawSize.x;
+        // computedSize.y = (rawSize.y <= 1.f) ? parentSize.y * rawSize.y : rawSize.y;
+        //
+        // bounds.size = computedSize;
+
         const auto bounds = getBounds();
         const bool isRow = (direction == Flex::Direction::Type::Row);
         auto lines = createFlexLines(bounds.size, isRow);
@@ -196,43 +213,66 @@ namespace wisp
         line.maxCrossSize = std::max(line.maxCrossSize, childCrossSize);
     }
 
-    void Box::setWidth(float width)
-    {
-        if(width <= 1.f)
-        {
-            if(auto parentLock = parent.lock())
-            {
-                bounds.size.x = parentLock->getBounds().size.x * width;
-                return;
-            }
-        }
-
-        bounds.size.x = width;
-    }
     const float Box::getWidth() { return bounds.size.x; }
-
-    void Box::setHeight(float height)
-    {
-
-        if(height <= 1.f)
-        {
-            if(auto parentLock = parent.lock())
-            {
-                bounds.size.y = parentLock->getBounds().size.y * height;
-                return;
-            }
-        }
-
-        bounds.size.y = height;
-    }
     const float Box::getHeight() { return bounds.size.y; }
-
-    void Box::setJustification(Flex::Justification::Type type) { justify = type; }
     const Flex::Justification::Type Box::getJustification() { return justify; }
-    void Box::setAlignment(Flex::Alignment::Type type) { align = type; }
     const Flex::Alignment::Type Box::getAlignment() { return align; }
-    void Box::setDirection(Flex::Direction::Type type) { direction = type; }
     const Flex::Direction::Type Box::getDirection() { return direction; }
+
+    void Box::setWidthInternal(float width)
+    {
+        // rawSize.x = width;
+        bounds.size.x = width;
+        availableSpace.x = width;
+        isDirty = true;
+        if(auto p = parent.lock())
+            p->setIsDirty(true);
+    }
+    void Box::setHeightInternal(float height)
+    {
+        // rawSize.y = height;
+        bounds.size.y = height;
+        availableSpace.y = height;
+        isDirty = true;
+        if(auto p = parent.lock())
+            p->setIsDirty(true);
+    }
+
+    Box::SharedSelf Box::setWidth(float width)
+    {
+        setWidthInternal(width);
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
+    Box::SharedSelf Box::setHeight(float height)
+    {
+        setHeightInternal(height);
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
+    Box::SharedSelf Box::setSize(sf::Vector2f size)
+    {
+        setWidthInternal(size.x);
+        setHeightInternal(size.y);
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
+
+    Box::SharedSelf Box::setDirection(Flex::Direction::Type direction)
+    {
+        this->direction = direction;
+        isDirty = true;
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
+    Box::SharedSelf Box::setJustification(Flex::Justification::Type justify)
+    {
+        this->justify = justify;
+        isDirty = true;
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
+    Box::SharedSelf Box::setAlignment(Flex::Alignment::Type align)
+    {
+        this->align = align;
+        isDirty = true;
+        return std::static_pointer_cast<Self>(shared_from_this());
+    }
 
     const char *Box::getName() const { return "Box"; };
 } // namespace wisp
