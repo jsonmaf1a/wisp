@@ -1,17 +1,18 @@
 #pragma once
 
-#include "../core/Component.hpp"
+#include "../ui/Box.hpp"
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <functional>
 
 namespace wisp
 {
-    class Button : public Component
+    class Button : public Box
     {
       public:
-        Button(sf::Vector2f size, std::string label, const sf::Font &font,
-               unsigned int fontSize = 14)
-            : Component(size)
+        Button(std::string label, sf::Font &font, unsigned int fontSize = 14)
+            : Box()
             , text(label)
             , font(font)
             , fontSize(fontSize) {};
@@ -25,9 +26,9 @@ namespace wisp
       private:
         std::function<EventResult(const EventContext &)> onClick;
         std::string text;
-        sf::Color background;
-        sf::Color foreground;
-        const sf::Font &font;
+        sf::Color background = sf::Color::Magenta;
+        sf::Color foreground = sf::Color::Black;
+        sf::Font &font;
         unsigned int fontSize;
 
         void drawLabel(sf::RenderWindow &window);

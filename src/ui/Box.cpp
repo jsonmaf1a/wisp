@@ -2,6 +2,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
 #include <print>
 #include <wisp/ui/Box.hpp>
 #include <wisp/utils/EventUtils.hpp>
@@ -34,8 +35,9 @@ namespace wisp
 
             if(contains(mousePosF))
             {
-                std::println("{} x: {}\ty: {}", "\033[31m[mousemove]\033[0m",
-                             mouseMoved->position.x, mouseMoved->position.y);
+                std::print("\r{} x: {}\ty: {}   ", "\033[31m[mousemove]\033[0m",
+                           mouseMoved->position.x, mouseMoved->position.y);
+                std::cout.flush();
 
                 return EventResult::Consumed;
             }
@@ -49,8 +51,12 @@ namespace wisp
 
             if(contains(mousePosF))
             {
-                printChildren();
-                std::println("Clicked on: {}", id);
+                std::println("Clicked on: {}\t{}x{} at {}x{}", id, bounds.size.x, bounds.size.y,
+                             bounds.position.x, bounds.position.y);
+
+                if(hasChildren())
+                    printChildren();
+
                 return EventResult::Consumed;
             }
         }
@@ -62,7 +68,7 @@ namespace wisp
     void Box::arrangeChildren()
     {
         const auto bounds = getBounds();
-        const bool isRow = (flexDirection == Flex::Direction::Type::Row);
+        const bool isRow = (direction == Flex::Direction::Type::Row);
         auto lines = createFlexLines(bounds.size, isRow);
 
         positionChildrenInLines(lines, bounds.position, isRow);
@@ -190,23 +196,22 @@ namespace wisp
         line.maxCrossSize = std::max(line.maxCrossSize, childCrossSize);
     }
 
-    Box *Box::setWidth(float width)
+    void Box::setWidth(float width)
     {
         if(width <= 1.f)
         {
             if(auto parentLock = parent.lock())
             {
                 bounds.size.x = parentLock->getBounds().size.x * width;
-                return this;
+                return;
             }
         }
 
         bounds.size.x = width;
-        return this;
     }
     const float Box::getWidth() { return bounds.size.x; }
 
-    Box *Box::setHeight(float height)
+    void Box::setHeight(float height)
     {
 
         if(height <= 1.f)
@@ -214,14 +219,20 @@ namespace wisp
             if(auto parentLock = parent.lock())
             {
                 bounds.size.y = parentLock->getBounds().size.y * height;
-                return this;
+                return;
             }
         }
 
         bounds.size.y = height;
-        return this;
     }
     const float Box::getHeight() { return bounds.size.y; }
+
+    void Box::setJustification(Flex::Justification::Type type) { justify = type; }
+    const Flex::Justification::Type Box::getJustification() { return justify; }
+    void Box::setAlignment(Flex::Alignment::Type type) { align = type; }
+    const Flex::Alignment::Type Box::getAlignment() { return align; }
+    void Box::setDirection(Flex::Direction::Type type) { direction = type; }
+    const Flex::Direction::Type Box::getDirection() { return direction; }
 
     const char *Box::getName() const { return "Box"; };
 } // namespace wisp

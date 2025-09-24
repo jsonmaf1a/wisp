@@ -77,16 +77,18 @@ namespace wisp
 
     void Component::printChildren() const
     {
-
         auto _children = this->children;
         std::sort(_children.begin(), _children.end(),
                   [](const auto &a, const auto &b) { return a->id < b->id; });
 
+        std::println("\033[32m[child ID]\t[name]\t\t[size and position]\033[0m");
         for(auto &child : _children)
         {
-            std::println("[{}] {}: {}x{} at {}x{}", child->id, getName(), child->bounds.size.x,
-                         child->bounds.size.y, child->bounds.position.x, child->bounds.position.y);
+            std::println("\033[33m[{}]\033[0m\t\t{}\t\t{}x{} at {}x{}", child->id, child->getName(),
+                         child->bounds.size.x, child->bounds.size.y, child->bounds.position.x,
+                         child->bounds.position.y);
         }
+        std::print("\n");
     }
 
     void Component::drawBoundingBox(sf::RenderWindow &window)

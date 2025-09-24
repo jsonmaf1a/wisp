@@ -47,13 +47,13 @@ namespace wisp
         centerX.setOutlineColor(sf::Color::Red);
         centerX.setOutlineThickness(0.5f);
         centerX.setFillColor(sf::Color::Red);
-        centerX.setPosition({bounds.position.x + bounds.size.x / 2.f, 0.f});
+        centerX.setPosition({bounds.position.x + bounds.size.x / 2.f, bounds.position.y});
 
         sf::RectangleShape centerY({bounds.size.x, 1.0f});
         centerY.setOutlineColor(sf::Color::Red);
         centerY.setOutlineThickness(0.5f);
         centerY.setFillColor(sf::Color::Red);
-        centerY.setPosition({0.f, bounds.position.y + bounds.size.y / 2.f});
+        centerY.setPosition({bounds.position.x, bounds.position.y + bounds.size.y / 2.f});
 
         window.draw(rect);
 #ifdef DEBUG
@@ -74,20 +74,10 @@ namespace wisp
             if(contains(mousePosF))
             {
                 return onClick(eventCtx);
+                return EventResult::Consumed;
             }
         }
 
-        if(eventCtx.event.is<sf::Event::MouseMoved>())
-        {
-            auto mouseMoved = eventCtx.event.getIf<sf::Event::MouseMoved>();
-            sf::Vector2f mousePosF(static_cast<float>(mouseMoved->position.x),
-                                   static_cast<float>(mouseMoved->position.y));
-
-            if(contains(mousePosF))
-            {
-                // std::cout << "mouse over: " << id << "\n";
-            }
-        }
         return EventResult::Ignored;
     };
 
@@ -98,5 +88,5 @@ namespace wisp
         this->onClick = onClick;
     }
 
-    const char *Button::getName() const { return "Box"; };
+    const char *Button::getName() const { return "Button"; };
 } // namespace wisp

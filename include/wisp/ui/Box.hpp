@@ -10,11 +10,11 @@ namespace wisp
     class Box : public Component
     {
       public:
-        Box(sf::RenderWindow &target, sf::FloatRect bounds)
+        Box(sf::FloatRect bounds)
             : Component(bounds)
             , availableSpace(bounds.size)
         {}
-        Box(sf::RenderWindow &target)
+        Box()
             : Component()
         {
             // WIP!!!
@@ -22,24 +22,42 @@ namespace wisp
             setBounds(bounds);
             availableSpace = bounds.size;
         }
+        Box(Flex::Direction::Type direction, Flex::Justification::Type justification,
+            Flex::Alignment::Type alignment)
+            : Component()
+            , availableSpace({0, 0})
+            , direction(direction)
+            , justify(justification)
+            , align(alignment)
+        {
+            sf::FloatRect bounds({0.f, 0.f}, {0.f, 0.f});
+            setBounds(bounds);
+            availableSpace = bounds.size;
+        }
         ~Box() = default;
 
-        virtual EventResult handleSelfEvent(const EventContext &eventCtx) override final;
-        virtual void arrangeChildren() override final;
-
-        Box *setWidth(float width);
+        void setWidth(float width);
         const float getWidth();
-        Box *setHeight(float height);
+        void setHeight(float height);
         const float getHeight();
+        void setJustification(Flex::Justification::Type type);
+        const Flex::Justification::Type getJustification();
+        void setAlignment(Flex::Alignment::Type type);
+        const Flex::Alignment::Type getAlignment();
+        void setDirection(Flex::Direction::Type type);
+        const Flex::Direction::Type getDirection();
+
+        virtual void arrangeChildren() override final;
 
       protected:
         sf::Vector2f availableSpace;
-        Flex::Direction::Type flexDirection = Flex::Direction::Type::Row;
+        Flex::Direction::Type direction = Flex::Direction::Type::Row;
         Flex::Justification::Type justify = Flex::Justification::Type::Start;
         Flex::Alignment::Type align = Flex::Alignment::Type::Start;
 
-        virtual const char *getName() const override final;
-        virtual void drawSelf(sf::RenderWindow &window) override final;
+        virtual EventResult handleSelfEvent(const EventContext &eventCtx) override;
+        virtual const char *getName() const override;
+        virtual void drawSelf(sf::RenderWindow &window) override;
 
       private:
         std::vector<Flex::FlexLine> createFlexLines(const sf::Vector2f &containerSize,
@@ -58,7 +76,6 @@ namespace wisp
         sf::Vector2f createChildPosition(float mainPos, float crossPos, bool isRow) const;
         bool shouldWrapToNewLine(const Flex::FlexLine &currentLine, float childMainSize,
                                  float availableMainSize) const;
-
         void addChildToLine(Flex::FlexLine &line, const std::shared_ptr<Component> &child,
                             float childMainSize, float childCrossSize) const;
     };

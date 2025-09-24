@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <concepts>
 #include <memory>
 #include <vector>
 
@@ -36,18 +37,23 @@ namespace wisp
 
         virtual void drawSelf(sf::RenderWindow &window) = 0;
         void drawBoundingBox(sf::RenderWindow &window);
-        virtual void arrangeChildren() = 0;
-
-      public:
-        virtual void draw(sf::RenderWindow &window);
-
-        EventResult handleEvent(const EventContext &event) override;
         virtual EventResult handleSelfEvent(const EventContext &eventCtx)
         {
             return EventResult::Ignored;
         }
 
+      public:
+        virtual void arrangeChildren() = 0;
+
+        virtual void draw(sf::RenderWindow &window);
+        EventResult handleEvent(const EventContext &event) override;
+
         void addChild(std::shared_ptr<Component> child);
+        template <std::derived_from<Component>... Components>
+        void addChildren(const std::shared_ptr<Components> &...components)
+        {
+            (addChild(components), ...);
+        }
         void removeChild(std::shared_ptr<Component> child);
         bool hasChildren() const;
         void printChildren() const;
@@ -57,7 +63,6 @@ namespace wisp
         bool isEnabled() const;
         void setBounds(const sf::FloatRect &bounds);
         const sf::FloatRect &getBounds() const;
-
         template <typename T> bool contains(const sf::Vector2<T> &position) const
         {
             return visible && enabled && bounds.contains(sf::Vector2f(position));
