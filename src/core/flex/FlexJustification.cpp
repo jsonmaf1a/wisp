@@ -1,6 +1,6 @@
 #include <wisp/core/flex/FlexJustification.hpp>
 
-namespace Flex::Justification
+namespace wisp::Flex::Justification
 {
     void FlexEnd::apply(FlexLine &line, bool isRow)
     {
@@ -101,4 +101,4 @@ namespace Flex::Justification
         }
         return std::make_unique<FlexStart>();
     }
-} // namespace Flex::Justification
+} // namespace wisp::Flex::Justification

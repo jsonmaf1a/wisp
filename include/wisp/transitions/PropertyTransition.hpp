@@ -3,31 +3,33 @@
 #include "../transitions/Transition.hpp"
 #include <functional>
 
-template <typename T> class PropertyTransition : public Transition
+namespace wisp
 {
-  public:
-    PropertyTransition(T start, T end, float duration,
-                       std::function<void(T)> applyValue)
-        : Transition(duration)
-        , start(start)
-        , end(end)
-        , applyValue(applyValue)
-    {}
-
-    void update(float deltaTime) override
+    template <typename T> class PropertyTransition : public Transition
     {
-        Transition::update(deltaTime);
+      public:
+        PropertyTransition(T start, T end, float duration, std::function<void(T)> applyValue)
+            : Transition(duration)
+            , start(start)
+            , end(end)
+            , applyValue(applyValue)
+        {}
 
-        float t = elapsedTime / duration;
-        T currentValue = interpolate(start, end, t);
+        void update(float deltaTime) override
+        {
+            Transition::update(deltaTime);
 
-        applyValue(currentValue);
-    }
+            float t = elapsedTime / duration;
+            T currentValue = interpolate(start, end, t);
 
-  private:
-    T start;
-    T end;
-    std::function<void(T)> applyValue;
+            applyValue(currentValue);
+        }
 
-    T interpolate(const T &start, const T &end, float t);
-};
+      private:
+        T start;
+        T end;
+        std::function<void(T)> applyValue;
+
+        T interpolate(const T &start, const T &end, float t);
+    };
+} // namespace wisp

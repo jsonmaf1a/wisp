@@ -2,7 +2,7 @@
 
 #include "FlexLine.hpp"
 
-namespace Flex::Justification
+namespace wisp::Flex::Justification
 {
     enum class Type
     {
@@ -55,4 +55,4 @@ namespace Flex::Justification
     };
 
     std::unique_ptr<Strategy> createStrategy(Type type);
-} // namespace Flex::Justification
+} // namespace wisp::Flex::Justification

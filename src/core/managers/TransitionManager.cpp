@@ -3,10 +3,10 @@
 
 namespace
 {
-    static std::vector<std::shared_ptr<Transition>> transitions;
+    std::vector<std::shared_ptr<wisp::Transition>> transitions;
 }
 
-namespace TransitionManager
+namespace wisp::TransitionManager
 {
 
     void update(float deltaTime)
@@ -30,4 +30,4 @@ namespace TransitionManager
     {
         transitions.push_back(transition);
     }
-} // namespace TransitionManager
+} // namespace wisp::TransitionManager

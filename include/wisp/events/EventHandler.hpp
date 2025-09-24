@@ -4,16 +4,19 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
-class EventHandler
+namespace wisp
 {
-  protected:
-    EventHandler() = default;
-
-  public:
-    virtual ~EventHandler() = default;
-
-    virtual EventResult handleEvent(const EventContext &eventCtx)
+    class EventHandler
     {
-        return EventResult::Ignored;
+      protected:
+        EventHandler() = default;
+
+      public:
+        virtual ~EventHandler() = default;
+
+        virtual EventResult handleEvent(const EventContext &eventCtx)
+        {
+            return EventResult::Ignored;
+        };
     };
-};
+} // namespace wisp

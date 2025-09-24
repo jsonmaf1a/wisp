@@ -6,13 +6,12 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <cmath>
 
-namespace VertexShapes
+namespace wisp::VertexShapes
 {
     class Ring : public sf::Drawable, public sf::Transformable
     {
       protected:
-        void draw(sf::RenderTarget &target,
-                  sf::RenderStates states) const override;
+        void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
       public:
         Ring(float innerRadius, float outerRadius, unsigned int points = 64);
@@ -29,4 +28,4 @@ namespace VertexShapes
 
         void updateGeometry();
     };
-} // namespace VertexShapes
+} // namespace wisp::VertexShapes

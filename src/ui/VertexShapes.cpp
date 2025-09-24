@@ -1,6 +1,6 @@
 #include <wisp/ui/VertexShapes.hpp>
 
-namespace VertexShapes
+namespace wisp::VertexShapes
 {
     Ring::Ring(float innerRadius, float outerRadius, unsigned int points)
         : innerRadius(innerRadius)
@@ -54,4 +54,4 @@ namespace VertexShapes
             vertices.append(sf::Vertex(outerPoint, fillColor));
         }
     }
-} // namespace VertexShapes
+} // namespace wisp::VertexShapes

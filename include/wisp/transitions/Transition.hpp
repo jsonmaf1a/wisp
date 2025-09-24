@@ -2,27 +2,30 @@
 
 #include <SFML/System/Vector2.hpp>
 
-class Transition
+namespace wisp
 {
-  protected:
-    float duration;
-    float elapsedTime = 0;
-    bool _isFinished = false;
-
-  public:
-    Transition(float duration)
-        : duration(duration)
-    {}
-
-    virtual void update(float deltaTime)
+    class Transition
     {
-        elapsedTime += deltaTime;
-        if(elapsedTime >= duration)
-        {
-            _isFinished = true;
-            elapsedTime = duration;
-        }
-    }
+      protected:
+        float duration;
+        float elapsedTime = 0;
+        bool _isFinished = false;
 
-    bool isFinished() const { return _isFinished; }
-};
+      public:
+        Transition(float duration)
+            : duration(duration)
+        {}
+
+        virtual void update(float deltaTime)
+        {
+            elapsedTime += deltaTime;
+            if(elapsedTime >= duration)
+            {
+                _isFinished = true;
+                elapsedTime = duration;
+            }
+        }
+
+        bool isFinished() const { return _isFinished; }
+    };
+} // namespace wisp

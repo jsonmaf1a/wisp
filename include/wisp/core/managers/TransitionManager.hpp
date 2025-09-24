@@ -2,9 +2,9 @@
 #include "../../transitions/Transition.hpp"
 #include <memory>
 
-namespace TransitionManager
+namespace wisp::TransitionManager
 {
     void update(float deltaTime);
     void addTransition(std::shared_ptr<Transition> transition);
 
-}; // namespace TransitionManager
+}; // namespace wisp::TransitionManager

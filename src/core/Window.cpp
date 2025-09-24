@@ -3,79 +3,82 @@
 #include <wisp/ui/Box.hpp>
 #include <wisp/utils/EventUtils.hpp>
 
-Window::Window(uint width, uint height, const std::string &title)
-    : ui(dispatcher)
-    , cursorManager(window)
-    , title(title)
+namespace wisp
 {
-    window.create(sf::VideoMode({width, height}), title, sf::Style::Close, sf::State::Windowed);
-
-    configure();
-    createRootBox();
-
-    isInitialized = true;
-}
-
-Window::~Window()
-{
-    if(isInitialized)
-        window.close();
-
-    isInitialized = false;
-}
-
-void Window::configure()
-{
-    window.setVerticalSyncEnabled(true);
-
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    int x = (desktop.size.x - window.getSize().x) / 2;
-    int y = (desktop.size.y - window.getSize().y) / 2;
-    window.setPosition(sf::Vector2i(x, y));
-}
-
-void Window::createRootBox()
-{
-    auto width = static_cast<float>(window.getSize().x);
-    auto height = static_cast<float>(window.getSize().y);
-
-    auto rootBox = std::make_shared<Box>(window, sf::FloatRect{{0.f, 0.f}, {width, height}});
-
-    ui.setRootBox(rootBox);
-}
-
-void Window::update()
-{
-    window.clear();
-
-    ui.draw(window);
-
-    window.display();
-}
-
-void Window::pollEvents()
-{
-    while(const std::optional event = window.pollEvent())
+    Window::Window(uint width, uint height, const std::string &title)
+        : ui(dispatcher)
+        , cursorManager(window)
+        , title(title)
     {
-        if(event->is<sf::Event::Closed>())
+        window.create(sf::VideoMode({width, height}), title, sf::Style::Close, sf::State::Windowed);
+
+        configure();
+        createRootBox();
+
+        isInitialized = true;
+    }
+
+    Window::~Window()
+    {
+        if(isInitialized)
             window.close();
 
-        if(const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
-            if(keyPressed->code == sf::Keyboard::Key::Escape)
+        isInitialized = false;
+    }
+
+    void Window::configure()
+    {
+        window.setVerticalSyncEnabled(true);
+
+        sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+        int x = (desktop.size.x - window.getSize().x) / 2;
+        int y = (desktop.size.y - window.getSize().y) / 2;
+        window.setPosition(sf::Vector2i(x, y));
+    }
+
+    void Window::createRootBox()
+    {
+        auto width = static_cast<float>(window.getSize().x);
+        auto height = static_cast<float>(window.getSize().y);
+
+        auto rootBox = std::make_shared<Box>(window, sf::FloatRect{{0.f, 0.f}, {width, height}});
+
+        ui.setRootBox(rootBox);
+    }
+
+    void Window::update()
+    {
+        window.clear();
+
+        ui.draw(window);
+
+        window.display();
+    }
+
+    void Window::pollEvents()
+    {
+        while(const std::optional event = window.pollEvent())
+        {
+            if(event->is<sf::Event::Closed>())
                 window.close();
 
-        if(EventUtils::isMouseEvent(event.value()))
-        {
-            dispatcher.dispatch(EventContext(event.value(), window, cursorManager));
+            if(const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
+                if(keyPressed->code == sf::Keyboard::Key::Escape)
+                    window.close();
+
+            if(EventUtils::isMouseEvent(event.value()))
+            {
+                dispatcher.dispatch(EventContext(event.value(), window, cursorManager));
+            }
         }
     }
-}
 
-sf::RenderWindow &Window::getRenderWindow() { return window; }
+    sf::RenderWindow &Window::getRenderWindow() { return window; }
 
-EventDispatcher &Window::getEventDispatcher() { return dispatcher; }
+    EventDispatcher &Window::getEventDispatcher() { return dispatcher; }
 
-UIManager &Window::getUI() { return ui; }
+    UIManager &Window::getUI() { return ui; }
 
-bool Window::isOpen() const { return window.isOpen(); }
-const std::string &Window::getTitle() const { return title; }
+    bool Window::isOpen() const { return window.isOpen(); }
+    const std::string &Window::getTitle() const { return title; }
+} // namespace wisp

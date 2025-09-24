@@ -1,31 +1,34 @@
 #pragma once
 
+#include "../../ui/Box.hpp"
 #include "../Component.hpp"
 #include "../managers/EventDispatcher.hpp"
 #include <concepts>
 #include <memory>
-#include <wisp/ui/Box.hpp>
 
-class UIManager
+namespace wisp
 {
-  public:
-    UIManager(EventDispatcher &dispatcher)
-        : dispatcher(dispatcher) {};
-
-    void addComponent(std::shared_ptr<Component> component);
-    template <std::derived_from<Component>... Components>
-    void addComponents(const std::shared_ptr<Components> &...components)
+    class UIManager
     {
-        (addComponent(components), ...);
-    }
-    void removeComponent(std::shared_ptr<Component> component);
-    void handleEvent(const EventContext &event);
-    void draw(sf::RenderWindow &window);
+      public:
+        UIManager(EventDispatcher &dispatcher)
+            : dispatcher(dispatcher) {};
 
-    std::shared_ptr<Box> rootBox;
-    void setRootBox(std::shared_ptr<Box>);
+        void addComponent(std::shared_ptr<Component> component);
+        template <std::derived_from<Component>... Components>
+        void addComponents(const std::shared_ptr<Components> &...components)
+        {
+            (addComponent(components), ...);
+        }
+        void removeComponent(std::shared_ptr<Component> component);
+        void handleEvent(const EventContext &event);
+        void draw(sf::RenderWindow &window);
 
-  private:
-    EventDispatcher &dispatcher;
-    sf::Clock clock;
-};
+        std::shared_ptr<Box> rootBox;
+        void setRootBox(std::shared_ptr<Box>);
+
+      private:
+        EventDispatcher &dispatcher;
+        sf::Clock clock;
+    };
+} // namespace wisp

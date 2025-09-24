@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace Flex
+namespace wisp::Flex
 {
     struct FlexLine
     {
@@ -13,4 +13,4 @@ namespace Flex
         float maxCrossSize = 0.f;
         float remainingSpace = 0.f;
     };
-} // namespace Flex
+} // namespace wisp::Flex

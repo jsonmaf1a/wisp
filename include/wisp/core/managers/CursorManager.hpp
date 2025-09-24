@@ -3,17 +3,20 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-class CursorManager
+namespace wisp
 {
-  public:
-    CursorManager(sf::RenderWindow &window);
-    ~CursorManager() = default;
+    class CursorManager
+    {
+      public:
+        CursorManager(sf::RenderWindow &window);
+        ~CursorManager() = default;
 
-    void setHandCursor();
-    void resetCursor();
+        void setHandCursor();
+        void resetCursor();
 
-  private:
-    sf::RenderWindow &window;
-    std::unique_ptr<sf::Cursor> handCursor;
-    std::unique_ptr<sf::Cursor> defaultCursor;
-};
+      private:
+        sf::RenderWindow &window;
+        std::unique_ptr<sf::Cursor> handCursor;
+        std::unique_ptr<sf::Cursor> defaultCursor;
+    };
+} // namespace wisp

@@ -1,99 +1,102 @@
 #include <wisp/ui/Button.hpp>
 #include <wisp/utils/EventUtils.hpp>
 
-void Button::drawSelf(sf::RenderWindow &window)
+namespace wisp
 {
-    drawBackground(window);
-    drawLabel(window);
-}
-
-void Button::drawLabel(sf::RenderWindow &window)
-{
-    sf::Text label(font, text, fontSize);
-    label.setOrigin(label.getLocalBounds().position);
-    label.setPosition(
-        {bounds.position.x + bounds.size.x / 2.f - label.getGlobalBounds().size.x / 2.f,
-         bounds.position.y + bounds.size.y / 2.f - label.getGlobalBounds().size.y / 2.f});
-    label.setFillColor(foreground);
-
-    sf::RectangleShape labelBounds(label.getLocalBounds().size);
-    labelBounds.setOutlineColor(sf::Color::Blue);
-    labelBounds.setOutlineThickness(1.0f);
-    labelBounds.setFillColor(sf::Color({0, 0, 255, 40}));
-    labelBounds.setPosition(bounds.position + bounds.size / 2.f -
-                            label.getLocalBounds().size / 2.f);
-
-    window.draw(label);
-#ifdef DEBUG
-    window.draw(labelBounds);
-#endif // DEBUG
-}
-void Button::drawBackground(sf::RenderWindow &window)
-{
-    auto bounds = getBounds();
-    sf::RectangleShape rect(bounds.size);
-    rect.setPosition(bounds.position);
-    rect.setFillColor(background);
-
-    sf::RectangleShape rectBounds({bounds.size.x - 2.f, bounds.size.y - 2.f});
-    rectBounds.setOutlineColor(sf::Color::Black);
-    rectBounds.setOutlineThickness(1.0f);
-    rectBounds.setPosition(bounds.position);
-    rectBounds.setFillColor(sf::Color::Transparent);
-
-    sf::RectangleShape centerX({1.0f, bounds.size.y});
-    centerX.setOutlineColor(sf::Color::Red);
-    centerX.setOutlineThickness(0.5f);
-    centerX.setFillColor(sf::Color::Red);
-    centerX.setPosition({bounds.position.x + bounds.size.x / 2.f, 0.f});
-
-    sf::RectangleShape centerY({bounds.size.x, 1.0f});
-    centerY.setOutlineColor(sf::Color::Red);
-    centerY.setOutlineThickness(0.5f);
-    centerY.setFillColor(sf::Color::Red);
-    centerY.setPosition({0.f, bounds.position.y + bounds.size.y / 2.f});
-
-    window.draw(rect);
-#ifdef DEBUG
-    window.draw(rectBounds);
-    window.draw(centerX);
-    window.draw(centerY);
-#endif // DEBUG
-}
-
-EventResult Button::handleSelfEvent(const EventContext &eventCtx)
-{
-    if(EventUtils::isLeftClickEvent(eventCtx.event))
+    void Button::drawSelf(sf::RenderWindow &window)
     {
-        auto mouseClick = eventCtx.event.getIf<sf::Event::MouseButtonPressed>();
-        sf::Vector2f mousePosF(static_cast<float>(mouseClick->position.x),
-                               static_cast<float>(mouseClick->position.y));
-
-        if(contains(mousePosF))
-        {
-            return onClick(eventCtx);
-        }
+        drawBackground(window);
+        drawLabel(window);
     }
 
-    if(eventCtx.event.is<sf::Event::MouseMoved>())
+    void Button::drawLabel(sf::RenderWindow &window)
     {
-        auto mouseMoved = eventCtx.event.getIf<sf::Event::MouseMoved>();
-        sf::Vector2f mousePosF(static_cast<float>(mouseMoved->position.x),
-                               static_cast<float>(mouseMoved->position.y));
+        sf::Text label(font, text, fontSize);
+        label.setOrigin(label.getLocalBounds().position);
+        label.setPosition(
+            {bounds.position.x + bounds.size.x / 2.f - label.getGlobalBounds().size.x / 2.f,
+             bounds.position.y + bounds.size.y / 2.f - label.getGlobalBounds().size.y / 2.f});
+        label.setFillColor(foreground);
 
-        if(contains(mousePosF))
-        {
-            // std::cout << "mouse over: " << id << "\n";
-        }
+        sf::RectangleShape labelBounds(label.getLocalBounds().size);
+        labelBounds.setOutlineColor(sf::Color::Blue);
+        labelBounds.setOutlineThickness(1.0f);
+        labelBounds.setFillColor(sf::Color({0, 0, 255, 40}));
+        labelBounds.setPosition(bounds.position + bounds.size / 2.f -
+                                label.getLocalBounds().size / 2.f);
+
+        window.draw(label);
+#ifdef DEBUG
+        window.draw(labelBounds);
+#endif // DEBUG
     }
-    return EventResult::Ignored;
-};
+    void Button::drawBackground(sf::RenderWindow &window)
+    {
+        auto bounds = getBounds();
+        sf::RectangleShape rect(bounds.size);
+        rect.setPosition(bounds.position);
+        rect.setFillColor(background);
 
-void Button::setText(std::string text) { this->text = text; }
+        sf::RectangleShape rectBounds({bounds.size.x - 2.f, bounds.size.y - 2.f});
+        rectBounds.setOutlineColor(sf::Color::Black);
+        rectBounds.setOutlineThickness(1.0f);
+        rectBounds.setPosition(bounds.position);
+        rectBounds.setFillColor(sf::Color::Transparent);
 
-void Button::setOnClick(std::function<EventResult(const EventContext &)> onClick)
-{
-    this->onClick = onClick;
-}
+        sf::RectangleShape centerX({1.0f, bounds.size.y});
+        centerX.setOutlineColor(sf::Color::Red);
+        centerX.setOutlineThickness(0.5f);
+        centerX.setFillColor(sf::Color::Red);
+        centerX.setPosition({bounds.position.x + bounds.size.x / 2.f, 0.f});
 
-const char *Button::getName() const { return "Box"; };
+        sf::RectangleShape centerY({bounds.size.x, 1.0f});
+        centerY.setOutlineColor(sf::Color::Red);
+        centerY.setOutlineThickness(0.5f);
+        centerY.setFillColor(sf::Color::Red);
+        centerY.setPosition({0.f, bounds.position.y + bounds.size.y / 2.f});
+
+        window.draw(rect);
+#ifdef DEBUG
+        window.draw(rectBounds);
+        window.draw(centerX);
+        window.draw(centerY);
+#endif // DEBUG
+    }
+
+    EventResult Button::handleSelfEvent(const EventContext &eventCtx)
+    {
+        if(EventUtils::isLeftClickEvent(eventCtx.event))
+        {
+            auto mouseClick = eventCtx.event.getIf<sf::Event::MouseButtonPressed>();
+            sf::Vector2f mousePosF(static_cast<float>(mouseClick->position.x),
+                                   static_cast<float>(mouseClick->position.y));
+
+            if(contains(mousePosF))
+            {
+                return onClick(eventCtx);
+            }
+        }
+
+        if(eventCtx.event.is<sf::Event::MouseMoved>())
+        {
+            auto mouseMoved = eventCtx.event.getIf<sf::Event::MouseMoved>();
+            sf::Vector2f mousePosF(static_cast<float>(mouseMoved->position.x),
+                                   static_cast<float>(mouseMoved->position.y));
+
+            if(contains(mousePosF))
+            {
+                // std::cout << "mouse over: " << id << "\n";
+            }
+        }
+        return EventResult::Ignored;
+    };
+
+    void Button::setText(std::string text) { this->text = text; }
+
+    void Button::setOnClick(std::function<EventResult(const EventContext &)> onClick)
+    {
+        this->onClick = onClick;
+    }
+
+    const char *Button::getName() const { return "Box"; };
+} // namespace wisp
