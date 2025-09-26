@@ -1,3 +1,4 @@
+#include "wisp/common/Dimensions.hpp"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -22,6 +23,18 @@ namespace wisp
         drawBoundingBox(window);
 #endif // DEBUG
     }
+
+    std::shared_ptr<Box> Box::attachTo(std::shared_ptr<Component> parent)
+    {
+        parent->addChild(std::static_pointer_cast<Box>(shared_from_this()));
+        return std::static_pointer_cast<Box>(shared_from_this());
+    }
+
+    std::shared_ptr<Box> Box::detach()
+    {
+        parent.reset();
+        return std::static_pointer_cast<Box>(shared_from_this());
+    };
 
     EventResult Box::handleSelfEvent(const EventContext &eventCtx)
     {
@@ -67,30 +80,27 @@ namespace wisp
 
     void Box::arrangeChildren()
     {
-        // sf::Vector2f parentSize{0, 0};
-        // if(auto p = parent.lock())
-        // {
-        //     parentSize = p->getBounds().size;
-        // }
-        // else
-        // {
-        //     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-        //     parentSize = {static_cast<float>(desktop.size.x),
-        //     static_cast<float>(desktop.size.y)};
-        // }
-        //
-        // computedSize.x = (rawSize.x <= 1.f) ? parentSize.x * rawSize.x : rawSize.x;
-        // computedSize.y = (rawSize.y <= 1.f) ? parentSize.y * rawSize.y : rawSize.y;
-        //
-        // bounds.size = computedSize;
+        if(!hasChildren())
+            return;
 
-        const auto bounds = getBounds();
-        const bool isRow = (direction == Flex::Direction::Type::Row);
-        auto lines = createFlexLines(bounds.size, isRow);
+        if(availableSpace.x <= 0 || availableSpace.y <= 0)
+        {
+            availableSpace = bounds.size;
+        }
+
+        computedSize.x = sizeSpec.width.resolve(availableSpace.x);
+        computedSize.y = sizeSpec.height.resolve(availableSpace.y);
+        computedSize.x = std::max(0.0f, computedSize.x);
+        computedSize.y = std::max(0.0f, computedSize.y);
+        bounds.size = computedSize;
+        std::println("{}x{}", bounds.size.x, bounds.size.y);
+
+        const bool isRow = (direction == Flex::Direction::Row);
+        auto lines = createFlexLines(computedSize, isRow);
 
         positionChildrenInLines(lines, bounds.position, isRow);
-        justifyContent(lines, bounds.size, isRow);
-        alignItems(lines, bounds.size, isRow);
+        justifyContent(lines, computedSize, isRow);
+        alignItems(lines, computedSize, isRow);
     }
 
     std::vector<Flex::FlexLine> Box::createFlexLines(const sf::Vector2f &containerSize,
@@ -103,7 +113,9 @@ namespace wisp
 
         for(const auto &child : children)
         {
-            const auto childSize = child->getBounds().size;
+            sf::Vector2f childSize{child->sizeSpec.width.resolve(containerSize.x),
+                                   child->sizeSpec.height.resolve(containerSize.y)};
+
             const float childMainSize = getMainAxisValue(childSize, isRow);
             const float childCrossSize = getCrossAxisValue(childSize, isRow);
 
@@ -143,10 +155,18 @@ namespace wisp
 
         for(const auto &child : line.items)
         {
-            const auto childSize = child->getBounds().size;
+            // const auto childSize = child->getBounds().size;
+            sf::Vector2f childSize{child->sizeSpec.width.resolve(computedSize.x),
+                                   child->sizeSpec.height.resolve(computedSize.y)};
             const auto childPosition = createChildPosition(mainPos, crossPos, isRow);
 
             child->setBounds(sf::FloatRect(childPosition, childSize));
+            child->availableSpace = {computedSize.x, computedSize.y};
+
+            if(child->getIsDirty())
+            {
+                child->arrangeChildren();
+            }
             mainPos += getMainAxisValue(childSize, isRow);
         }
     }
@@ -155,7 +175,7 @@ namespace wisp
                              bool isRow)
     {
         const float availableMainSize = getMainAxisValue(containerSize, isRow);
-        auto strategy = Flex::Justification::createStrategy(justify);
+        auto strategy = Flex::createJustificationStrategy(justify);
 
         for(auto &line : lines)
         {
@@ -170,17 +190,7 @@ namespace wisp
     void Box::alignItems(std::vector<Flex::FlexLine> &lines, const sf::Vector2f &containerSize,
                          bool isRow)
     {
-        // const float availableMainSize = getMainAxisValue(containerSize, isRow);
-        // auto strategy = Flex::Alignment::createStrategy(align);
-        //
-        // for(auto &line : lines)
-        // {
-        //     line.remainingSpace = availableMainSize - line.totalMainSize;
-        //     if(line.remainingSpace > 0)
-        //     {
-        //         strategy->apply(line, isRow);
-        //     }
-        // }
+        // TODO: align items
     }
 
     float Box::getMainAxisValue(const sf::Vector2f &vector, bool isRow) const
@@ -215,63 +225,71 @@ namespace wisp
 
     const float Box::getWidth() { return bounds.size.x; }
     const float Box::getHeight() { return bounds.size.y; }
-    const Flex::Justification::Type Box::getJustification() { return justify; }
-    const Flex::Alignment::Type Box::getAlignment() { return align; }
-    const Flex::Direction::Type Box::getDirection() { return direction; }
+    const Flex::Justification Box::getJustification() { return justify; }
+    const Flex::Alignment Box::getAlignment() { return align; }
+    const Flex::Direction Box::getDirection() { return direction; }
 
-    void Box::setWidthInternal(float width)
+    std::shared_ptr<Box> Box::setWidth(float width, wisp::Size::Unit unit)
     {
-        // rawSize.x = width;
-        bounds.size.x = width;
-        availableSpace.x = width;
+        // availableSpace.x = width;
+        sizeSpec.width = {width, unit};
         isDirty = true;
         if(auto p = parent.lock())
             p->setIsDirty(true);
+
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
-    void Box::setHeightInternal(float height)
+    std::shared_ptr<Box> Box::setFullWidth()
     {
-        // rawSize.y = height;
-        bounds.size.y = height;
-        availableSpace.y = height;
+        setWidth(1, wisp::Size::Unit::Percent);
+        return std::static_pointer_cast<Box>(shared_from_this());
+    }
+
+    std::shared_ptr<Box> Box::setHeight(float height, wisp::Size::Unit unit)
+    {
+        // availableSpace.y = height;
+        sizeSpec.height = {height, unit};
         isDirty = true;
         if(auto p = parent.lock())
             p->setIsDirty(true);
+        return std::static_pointer_cast<Box>(shared_from_this());
+    }
+    std::shared_ptr<Box> Box::setFullHeight()
+    {
+        setHeight(1, wisp::Size::Unit::Percent);
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
 
-    Box::SharedSelf Box::setWidth(float width)
+    std::shared_ptr<Box> Box::setSize(sf::Vector2f size, wisp::Size::Unit unit)
     {
-        setWidthInternal(width);
-        return std::static_pointer_cast<Self>(shared_from_this());
-    }
-    Box::SharedSelf Box::setHeight(float height)
-    {
-        setHeightInternal(height);
-        return std::static_pointer_cast<Self>(shared_from_this());
-    }
-    Box::SharedSelf Box::setSize(sf::Vector2f size)
-    {
-        setWidthInternal(size.x);
-        setHeightInternal(size.y);
-        return std::static_pointer_cast<Self>(shared_from_this());
+        setWidth(size.x, unit);
+        setHeight(size.y, unit);
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
 
-    Box::SharedSelf Box::setDirection(Flex::Direction::Type direction)
+    std::shared_ptr<Box> Box::setDirection(Flex::Direction direction)
     {
         this->direction = direction;
         isDirty = true;
-        return std::static_pointer_cast<Self>(shared_from_this());
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
-    Box::SharedSelf Box::setJustification(Flex::Justification::Type justify)
+    std::shared_ptr<Box> Box::setJustification(Flex::Justification justify)
     {
         this->justify = justify;
         isDirty = true;
-        return std::static_pointer_cast<Self>(shared_from_this());
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
-    Box::SharedSelf Box::setAlignment(Flex::Alignment::Type align)
+    std::shared_ptr<Box> Box::setAlignment(Flex::Alignment align)
     {
         this->align = align;
         isDirty = true;
-        return std::static_pointer_cast<Self>(shared_from_this());
+        return std::static_pointer_cast<Box>(shared_from_this());
+    }
+    std::shared_ptr<Box> Box::setAvailableSpace(sf::Vector2f size)
+    {
+        this->availableSpace = size;
+        isDirty = true;
+        return std::static_pointer_cast<Box>(shared_from_this());
     }
 
     const char *Box::getName() const { return "Box"; };

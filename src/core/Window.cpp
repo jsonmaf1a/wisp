@@ -42,7 +42,9 @@ namespace wisp
         auto width = static_cast<float>(window.getSize().x);
         auto height = static_cast<float>(window.getSize().y);
 
-        auto rootBox = std::make_shared<Box>(sf::FloatRect{{0.f, 0.f}, {width, height}});
+        auto rootBox =
+            wisp::Box::create()->setSize({width, height})->setAvailableSpace({width, height});
+        // ->setSize({width, height}, DimensionSize::Unit::Pixels)
 
         ui.setRootBox(rootBox);
     }

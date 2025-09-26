@@ -78,15 +78,42 @@ namespace wisp
             }
         }
 
+        if(eventCtx.event.is<sf::Event::MouseMoved>())
+        {
+            const auto mouseMoved = eventCtx.event.getIf<sf::Event::MouseMoved>();
+
+            sf::Vector2f mousePosF(static_cast<float>(mouseMoved->position.x),
+                                   static_cast<float>(mouseMoved->position.y));
+
+            if(contains(mousePosF))
+            {
+                eventCtx.cursorManager.setHandCursor();
+                return EventResult::Consumed;
+            }
+            else
+            {
+                eventCtx.cursorManager.resetCursor();
+            }
+        }
+
         return EventResult::Ignored;
     };
 
-    void Button::setText(std::string text) { this->text = text; }
+    std::shared_ptr<Button> Button::setText(std::string text)
+    {
+        this->text = text;
 
-    void Button::setOnClick(std::function<EventResult(const EventContext &)> onClick)
+        return std::static_pointer_cast<Button>(shared_from_this());
+    }
+
+    std::shared_ptr<Button> Button::setOnClick(
+        std::function<EventResult(const EventContext &)> onClick)
     {
         this->onClick = onClick;
+        return std::static_pointer_cast<Button>(shared_from_this());
     }
 
     const char *Button::getName() const { return "Button"; };
+
+    // std::shared_ptr<Button>
 } // namespace wisp

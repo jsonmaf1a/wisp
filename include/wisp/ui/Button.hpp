@@ -4,22 +4,33 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <array>
 #include <functional>
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
 
 namespace wisp
 {
     class Button : public Box
     {
       public:
-        Button(std::string label, sf::Font &font, unsigned int fontSize = 14)
+        static std::shared_ptr<Button> create(std::string label, sf::Font &font,
+                                              unsigned int fontSize = 16)
+        {
+            return std::make_shared<Button>(label, font, fontSize);
+        }
+
+        Button(std::string label, sf::Font &font, unsigned int fontSize)
             : Box()
             , text(label)
             , font(font)
             , fontSize(fontSize) {};
         ~Button() = default;
 
-        void setText(std::string text);
-        void setOnClick(std::function<EventResult(const EventContext &)> onClick);
+        std::shared_ptr<Button> setText(std::string text);
+        std::shared_ptr<Button> setOnClick(
+            std::function<EventResult(const EventContext &)> onClick);
         virtual void drawSelf(sf::RenderWindow &window) override final;
         virtual EventResult handleSelfEvent(const EventContext &eventCtx) override final;
 

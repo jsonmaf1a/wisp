@@ -2,6 +2,7 @@
 
 #include "../core/Component.hpp"
 #include "../core/flex/Flex.hpp"
+#include "wisp/common/Dimensions.hpp"
 #include <memory>
 #include <vector>
 
@@ -9,66 +10,61 @@ namespace wisp
 {
     class Box : public Component
     {
-      public:
-        using Self = Box;
-        using SharedSelf = std::shared_ptr<Box>;
 
-        static SharedSelf create(const sf::FloatRect &bounds = {{0, 0}, {0, 0}})
+      public:
+        static std::shared_ptr<Box> create(/* const sf::FloatRect &bounds = {{0, 0}, {0, 0}} */)
         {
-            return std::make_shared<Box>(bounds);
+            return std::make_shared<Box>(/* bounds */);
         }
 
-        SharedSelf setSize(sf::Vector2f size);
-        SharedSelf setWidth(float width);
-        SharedSelf setHeight(float width);
-        SharedSelf setDirection(Flex::Direction::Type direction);
-        SharedSelf setJustification(Flex::Justification::Type justify);
-        SharedSelf setAlignment(Flex::Alignment::Type align);
+        std::shared_ptr<Box> setSize(sf::Vector2f size, wisp::Size::Unit unit = Size::Unit::Pixels);
+        std::shared_ptr<Box> setWidth(float width, wisp::Size::Unit unit = Size::Unit::Pixels);
+        std::shared_ptr<Box> setFullWidth();
+        std::shared_ptr<Box> setHeight(float width, wisp::Size::Unit unit = Size::Unit::Pixels);
+        std::shared_ptr<Box> setFullHeight();
+        std::shared_ptr<Box> setDirection(Flex::Direction direction);
+        std::shared_ptr<Box> setJustification(Flex::Justification justify);
+        std::shared_ptr<Box> setAlignment(Flex::Alignment align);
+        std::shared_ptr<Box> setAvailableSpace(sf::Vector2f size);
+        std::shared_ptr<Box> attachTo(std::shared_ptr<Component> parent);
+        std::shared_ptr<Box> detach();
 
         Box(sf::FloatRect bounds)
             : Component(bounds)
-            , availableSpace(bounds.size)
         {}
+
         Box()
             : Component()
+            , direction(Flex::Direction::Row)
+            , justify(Flex::Justification::Start)
+            , align(Flex::Alignment::Start)
         {
-            // WIP!!!
-            sf::FloatRect bounds({0.f, 0.f}, {100.f, 100.f});
-            setBounds(bounds);
-            availableSpace = bounds.size;
+            sizeSpec.width = {1.f, wisp::Size::Unit::Percent};
+            sizeSpec.height = {1.f, wisp::Size::Unit::Percent};
         }
-        Box(Flex::Direction::Type direction, Flex::Justification::Type justification,
-            Flex::Alignment::Type alignment)
+        Box(Flex::Direction direction, Flex::Justification justification, Flex::Alignment alignment)
             : Component()
-            , availableSpace({0, 0})
             , direction(direction)
             , justify(justification)
             , align(alignment)
         {
-            sf::FloatRect bounds({0.f, 0.f}, {0.f, 0.f});
-            setBounds(bounds);
-            availableSpace = bounds.size;
+            sizeSpec.width = {1.f, wisp::Size::Unit::Percent};
+            sizeSpec.height = {1.f, wisp::Size::Unit::Percent};
         }
         ~Box() = default;
 
         const float getWidth();
         const float getHeight();
-        const Flex::Justification::Type getJustification();
-        const Flex::Alignment::Type getAlignment();
-        const Flex::Direction::Type getDirection();
+        const Flex::Justification getJustification();
+        const Flex::Alignment getAlignment();
+        const Flex::Direction getDirection();
 
         virtual void arrangeChildren() override final;
 
       protected:
-        sf::Vector2f availableSpace;
-
-        // TODO: remove this bullshit
-        sf::Vector2f rawSize{0, 0};
-        sf::Vector2f computedSize{0, 0};
-
-        Flex::Direction::Type direction = Flex::Direction::Type::Row;
-        Flex::Justification::Type justify = Flex::Justification::Type::Start;
-        Flex::Alignment::Type align = Flex::Alignment::Type::Start;
+        Flex::Direction direction;
+        Flex::Justification justify;
+        Flex::Alignment align;
 
         virtual EventResult handleSelfEvent(const EventContext &eventCtx) override;
         virtual const char *getName() const override;
@@ -93,8 +89,5 @@ namespace wisp
                                  float availableMainSize) const;
         void addChildToLine(Flex::FlexLine &line, const std::shared_ptr<Component> &child,
                             float childMainSize, float childCrossSize) const;
-
-        void setWidthInternal(float width);
-        void setHeightInternal(float width);
     };
 } // namespace wisp

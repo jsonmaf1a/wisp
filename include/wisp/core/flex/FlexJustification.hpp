@@ -2,9 +2,9 @@
 
 #include "FlexLine.hpp"
 
-namespace wisp::Flex::Justification
+namespace wisp::Flex
 {
-    enum class Type
+    enum class Justification
     {
         Start,
         Center,
@@ -54,5 +54,5 @@ namespace wisp::Flex::Justification
         void apply(FlexLine &line, bool isRow) override final;
     };
 
-    std::unique_ptr<Strategy> createStrategy(Type type);
-} // namespace wisp::Flex::Justification
+    std::unique_ptr<Strategy> createJustificationStrategy(Justification type);
+} // namespace wisp::Flex

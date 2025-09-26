@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../events/EventHandler.hpp"
+#include "wisp/common/Dimensions.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -13,15 +14,27 @@ namespace wisp
     class Component : public EventHandler, public std::enable_shared_from_this<Component>
     {
       public:
+        SizeSpec sizeSpec;
+        sf::Vector2f computedSize{0, 0};
+        sf::Vector2f availableSpace;
+
         virtual void arrangeChildren() = 0;
         virtual void draw(sf::RenderWindow &window);
         EventResult handleEvent(const EventContext &event) override;
 
-        void addChild(std::shared_ptr<Component> child);
+        void addChild(std::shared_ptr<Component> child)
+        {
+            child->parent = this->weak_from_this();
+            children.push_back(child);
+            isDirty = true;
+            // return this->shared_from_this();
+        }
+
         template <std::derived_from<Component>... Components>
         void addChildren(const std::shared_ptr<Components> &...components)
         {
             (addChild(components), ...);
+            // return this->shared_from_this();
         }
         void removeChild(std::shared_ptr<Component> child);
         bool hasChildren() const;
@@ -42,10 +55,12 @@ namespace wisp
       protected:
         Component(sf::FloatRect bounds)
             : id(nextID++)
-            , bounds(bounds) {};
+            , bounds(bounds)
+            , availableSpace(bounds.size) {};
         Component(sf::Vector2f size)
             : id(nextID++)
-            , bounds(sf::FloatRect({0, 0}, size)) {};
+            , bounds(sf::FloatRect({0, 0}, size))
+            , availableSpace(size) {};
         Component()
             : id(nextID++)
             , bounds(sf::FloatRect({0, 0}, {0, 0})) {};

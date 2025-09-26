@@ -1,8 +1,8 @@
 #pragma once
 
-namespace wisp::Flex::Alignment
+namespace wisp::Flex
 {
-    enum class Type
+    enum class Alignment
     {
         Start,
         End,
@@ -10,4 +10,4 @@ namespace wisp::Flex::Alignment
         Stretch,
         Baseline
     };
-} // namespace wisp::Flex::Alignment
+} // namespace wisp::Flex

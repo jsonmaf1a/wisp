@@ -1,6 +1,6 @@
 #include <wisp/core/flex/FlexJustification.hpp>
 
-namespace wisp::Flex::Justification
+namespace wisp::Flex
 {
     void FlexEnd::apply(FlexLine &line, bool isRow)
     {
@@ -82,23 +82,23 @@ namespace wisp::Flex::Justification
         }
     }
 
-    std::unique_ptr<Strategy> createStrategy(Flex::Justification::Type type)
+    std::unique_ptr<Strategy> createJustificationStrategy(Flex::Justification type)
     {
         switch(type)
         {
-            case Flex::Justification::Type::Start:
+            case Flex::Justification::Start:
                 return std::make_unique<FlexStart>();
-            case Flex::Justification::Type::End:
+            case Flex::Justification::End:
                 return std::make_unique<FlexEnd>();
-            case Flex::Justification::Type::Center:
+            case Flex::Justification::Center:
                 return std::make_unique<Center>();
-            case Flex::Justification::Type::SpaceBetween:
+            case Flex::Justification::SpaceBetween:
                 return std::make_unique<SpaceBetween>();
-            case Flex::Justification::Type::SpaceAround:
+            case Flex::Justification::SpaceAround:
                 return std::make_unique<SpaceAround>();
-            case Flex::Justification::Type::SpaceEvenly:
+            case Flex::Justification::SpaceEvenly:
                 return std::make_unique<SpaceEvenly>();
         }
         return std::make_unique<FlexStart>();
     }
-} // namespace wisp::Flex::Justification
+} // namespace wisp::Flex

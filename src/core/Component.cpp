@@ -8,14 +8,6 @@
 
 namespace wisp
 {
-    void Component::addChild(std::shared_ptr<Component> child)
-    {
-        isDirty = true;
-
-        child->parent = weak_from_this();
-        children.push_back(child);
-    }
-
     void Component::removeChild(std::shared_ptr<Component> child)
     {
         isDirty = true;
@@ -69,18 +61,40 @@ namespace wisp
         return handleSelfEvent(event);
     }
 
-    void Component::setVisible(bool visible) { this->visible = visible; }
+    void Component::setVisible(bool visible)
+    {
+        this->visible = visible;
+        isDirty = true;
+    }
 
     bool Component::isVisible() const { return visible; }
 
-    void Component::setEnabled(bool enabled) { this->enabled = enabled; }
+    void Component::setEnabled(bool enabled)
+    {
+        this->enabled = enabled;
+        isDirty = true;
+    }
 
     bool Component::isEnabled() const { return enabled; }
 
-    void Component::setIsDirty(bool dirty) { isDirty = dirty; }
+    void Component::setIsDirty(bool dirty)
+    {
+        isDirty = dirty;
+        if(auto p = parent.lock())
+            p->setIsDirty(true);
+    }
     const bool Component::getIsDirty() { return isDirty; }
 
-    void Component::setBounds(const sf::FloatRect &bounds) { this->bounds = bounds; }
+    void Component::setBounds(const sf::FloatRect &bounds)
+    {
+        if(this->bounds != bounds)
+        {
+            this->bounds = bounds;
+            // this->availableSpace = bounds.size; // Add this line
+            setIsDirty(true);  // Ensure layout recalculation
+            arrangeChildren(); // Trigger layout update
+        }
+    }
 
     const sf::FloatRect &Component::getBounds() const { return bounds; }
 

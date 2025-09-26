@@ -1,10 +1,10 @@
 #pragma once
 
-namespace wisp::Flex::Direction
+namespace wisp::Flex
 {
-    enum class Type
+    enum class Direction
     {
         Row,
         Column
     };
-} // namespace wisp::Flex::Direction
+} // namespace wisp::Flex
